@@ -1,13 +1,13 @@
 class ParameterMap {
     key: string;
-    value: { [key: string]: string; };
+    value: Map<string, string>;
 
-    constructor(key: string, value: { [key: string]: string; }) {
+    constructor(key: string, value: Map<string, string>) {
         this.key = key;
         this.value = value;
     }
 
-    match(key: string): { [key: string]: string; } | null {
+    match(key: string): Map<string, string> | null {
         //TODO: regex match
         if ( this.key == key) {
             return this.value
