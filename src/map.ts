@@ -1,46 +1,46 @@
 class ParameterMap {
-    key: string;
-    value: Map<string, string>;
+  key: string
+  value: Map<string, string>
 
-    constructor(key: string, value: Map<string, string>) {
-        this.key = key;
-        this.value = value;
-    }
+  constructor(key: string, value: Map<string, string>) {
+    this.key = key
+    this.value = value
+  }
 
-    match(key: string): {ok:boolean, value?:Map<string, string>}{
-        //TODO: regex match
-        if ( this.key == key) {
-            return {ok: true, value: this.value}
-        }
-        return {ok: false}
+  match(key: string): {ok: boolean; value?: Map<string, string>} {
+    //TODO: regex match
+    if (this.key === key) {
+      return {ok: true, value: this.value}
     }
+    return {ok: false}
+  }
 }
 
 export class ParameterMapList {
-    prams: ParameterMap[];
+  prams: ParameterMap[]
 
-    constructor(raw_json: string) {
-        let ps = new Array<ParameterMap>()
-        let parsed = JSON.parse(raw_json)
-        //TODO: validation
-        for (let key in parsed) {
-            let values = new Map<string, string>()
-            for (let val in parsed[key]) {
-                values.set(val, parsed[key][val]);
-            }
-            let p = new ParameterMap(key, values)
-            ps.push(p)
-        }
-        this.prams = ps
+  constructor(rawJSON: string) {
+    const ps = new Array<ParameterMap>()
+    const parsed = JSON.parse(rawJSON)
+    //TODO: validation
+    for (const key in parsed) {
+      const values = new Map<string, string>()
+      for (const val in parsed[key]) {
+        values.set(val, parsed[key][val])
+      }
+      const p = new ParameterMap(key, values)
+      ps.push(p)
     }
+    this.prams = ps
+  }
 
-    match(key: string): {ok:boolean, value?:Map<string, string>} {
-        this.prams.forEach(param => {
-            let matched = param.match(key)
-            if ( matched.ok) {
-                return matched
-            }
-        })
-        return {ok: false}
+  match(key: string): {ok: boolean; value?: Map<string, string>} {
+    for (const param of this.prams) {
+      const matched = param.match(key)
+      if (matched.ok) {
+        return matched
+      }
     }
+    return {ok: false}
+  }
 }

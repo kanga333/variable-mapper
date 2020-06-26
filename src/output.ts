@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 
-function logOutput(input: Map<string, string>): void {
-    input.forEach((value, key) => {
-        core.info(`${key}: ${value}`)
-    })
+export function logOutput(input: Map<string, string>): void {
+  for (const key in input.keys()) {
+    core.info(`${key}: ${input.get(key)}`)
+  }
 }
