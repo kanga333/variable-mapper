@@ -55,15 +55,6 @@ module.exports = require("os");
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -73,23 +64,76 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
-const wait_1 = __webpack_require__(521);
+const map_1 = __webpack_require__(301);
+const output_1 = __webpack_require__(490);
 function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const ms = core.getInput('milliseconds');
-            core.debug(`Waiting ${ms} milliseconds ...`);
-            core.debug(new Date().toTimeString());
-            yield wait_1.wait(parseInt(ms, 10));
-            core.debug(new Date().toTimeString());
-            core.setOutput('time', new Date().toTimeString());
+    try {
+        const map = core.getInput('map');
+        const key = core.getInput('key');
+        const params = new map_1.ParameterMapList(map);
+        const matched = params.match(key);
+        if (matched.ok) {
+            core.info(`No match for the ${key} key`);
+            return;
         }
-        catch (error) {
-            core.setFailed(error.message);
+        if (matched.value) {
+            output_1.logOutput(matched.value);
         }
-    });
+    }
+    catch (error) {
+        core.setFailed(error.message);
+    }
 }
 run();
+
+
+/***/ }),
+
+/***/ 301:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+class ParameterMap {
+    constructor(key, value) {
+        this.key = key;
+        this.value = value;
+    }
+    match(key) {
+        //TODO: regex match
+        if (this.key === key) {
+            return { ok: true, value: this.value };
+        }
+        return { ok: false };
+    }
+}
+class ParameterMapList {
+    constructor(rawJSON) {
+        const ps = new Array();
+        const parsed = JSON.parse(rawJSON);
+        //TODO: validation
+        for (const key in parsed) {
+            const values = new Map();
+            for (const val in parsed[key]) {
+                values.set(val, parsed[key][val]);
+            }
+            const p = new ParameterMap(key, values);
+            ps.push(p);
+        }
+        this.prams = ps;
+    }
+    match(key) {
+        for (const param of this.prams) {
+            const matched = param.match(key);
+            if (matched.ok) {
+                return matched;
+            }
+        }
+        return { ok: false };
+    }
+}
+exports.ParameterMapList = ParameterMapList;
 
 
 /***/ }),
@@ -109,18 +153,18 @@ const os = __webpack_require__(87);
  *
  * Examples:
  *   ##[warning]This is the user warning message
- *   ##[set-secret name=mypassword]definatelyNotAPassword!
+ *   ##[set-secret name=mypassword]definitelyNotAPassword!
  */
 function issueCommand(command, properties, message) {
     const cmd = new Command(command, properties, message);
     process.stdout.write(cmd.toString() + os.EOL);
 }
 exports.issueCommand = issueCommand;
-function issue(name, message) {
+function issue(name, message = '') {
     issueCommand(name, {}, message);
 }
 exports.issue = issue;
-const CMD_PREFIX = '##[';
+const CMD_STRING = '::';
 class Command {
     constructor(command, properties, message) {
         if (!command) {
@@ -131,7 +175,7 @@ class Command {
         this.message = message;
     }
     toString() {
-        let cmdStr = CMD_PREFIX + this.command;
+        let cmdStr = CMD_STRING + this.command;
         if (this.properties && Object.keys(this.properties).length > 0) {
             cmdStr += ' ';
             for (const key in this.properties) {
@@ -140,12 +184,12 @@ class Command {
                     if (val) {
                         // safely append the val - avoid blowing up when attempting to
                         // call .replace() if message is not a string for some reason
-                        cmdStr += `${key}=${escape(`${val || ''}`)};`;
+                        cmdStr += `${key}=${escape(`${val || ''}`)},`;
                     }
                 }
             }
         }
-        cmdStr += ']';
+        cmdStr += CMD_STRING;
         // safely append the message - avoid blowing up when attempting to
         // call .replace() if message is not a string for some reason
         const message = `${this.message || ''}`;
@@ -172,8 +216,18 @@ function escape(s) {
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const command_1 = __webpack_require__(431);
+const os = __webpack_require__(87);
 const path = __webpack_require__(622);
 /**
  * The code to exit an action
@@ -193,7 +247,7 @@ var ExitCode;
 // Variables
 //-----------------------------------------------------------------------
 /**
- * sets env variable for this action and future actions in the job
+ * Sets env variable for this action and future actions in the job
  * @param name the name of the variable to set
  * @param val the value of the variable
  */
@@ -203,15 +257,13 @@ function exportVariable(name, val) {
 }
 exports.exportVariable = exportVariable;
 /**
- * exports the variable and registers a secret which will get masked from logs
- * @param name the name of the variable to set
- * @param val value of the secret
+ * Registers a secret which will get masked from logs
+ * @param secret value of the secret
  */
-function exportSecret(name, val) {
-    exportVariable(name, val);
-    command_1.issueCommand('set-secret', {}, val);
+function setSecret(secret) {
+    command_1.issueCommand('add-mask', {}, secret);
 }
-exports.exportSecret = exportSecret;
+exports.setSecret = setSecret;
 /**
  * Prepends inputPath to the PATH (for this action and future actions)
  * @param inputPath
@@ -229,7 +281,7 @@ exports.addPath = addPath;
  * @returns   string
  */
 function getInput(name, options) {
-    const val = process.env[`INPUT_${name.replace(' ', '_').toUpperCase()}`] || '';
+    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
     if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
     }
@@ -286,36 +338,101 @@ function warning(message) {
     command_1.issue('warning', message);
 }
 exports.warning = warning;
+/**
+ * Writes info to log with console.log.
+ * @param message info message
+ */
+function info(message) {
+    process.stdout.write(message + os.EOL);
+}
+exports.info = info;
+/**
+ * Begin an output group.
+ *
+ * Output until the next `groupEnd` will be foldable in this group
+ *
+ * @param name The name of the output group
+ */
+function startGroup(name) {
+    command_1.issue('group', name);
+}
+exports.startGroup = startGroup;
+/**
+ * End an output group.
+ */
+function endGroup() {
+    command_1.issue('endgroup');
+}
+exports.endGroup = endGroup;
+/**
+ * Wrap an asynchronous function call in a group.
+ *
+ * Returns the same type as the function itself.
+ *
+ * @param name The name of the group
+ * @param fn The function to wrap in the group
+ */
+function group(name, fn) {
+    return __awaiter(this, void 0, void 0, function* () {
+        startGroup(name);
+        let result;
+        try {
+            result = yield fn();
+        }
+        finally {
+            endGroup();
+        }
+        return result;
+    });
+}
+exports.group = group;
+//-----------------------------------------------------------------------
+// Wrapper action state
+//-----------------------------------------------------------------------
+/**
+ * Saves state for current action, the state can only be retrieved by this action's post job execution.
+ *
+ * @param     name     name of the state to store
+ * @param     value    value to store
+ */
+function saveState(name, value) {
+    command_1.issueCommand('save-state', { name }, value);
+}
+exports.saveState = saveState;
+/**
+ * Gets the value of an state set by this action's main execution.
+ *
+ * @param     name     name of the state to get
+ * @returns   string
+ */
+function getState(name) {
+    return process.env[`STATE_${name}`] || '';
+}
+exports.getState = getState;
 //# sourceMappingURL=core.js.map
 
 /***/ }),
 
-/***/ 521:
-/***/ (function(__unusedmodule, exports) {
+/***/ 490:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-function wait(milliseconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => {
-            if (isNaN(milliseconds)) {
-                throw new Error('milliseconds not a number');
-            }
-            setTimeout(() => resolve('done!'), milliseconds);
-        });
-    });
+const core = __importStar(__webpack_require__(470));
+function logOutput(input) {
+    for (const key in input.keys()) {
+        core.info(`${key}: ${input.get(key)}`);
+    }
 }
-exports.wait = wait;
+exports.logOutput = logOutput;
 
 
 /***/ }),
