@@ -72,8 +72,8 @@ function run() {
         const key = core.getInput('key');
         const params = new map_1.ParameterMapList(map);
         const matched = params.match(key);
-        if (matched.ok) {
-            core.info(`No match for the ${key} key`);
+        if (!matched.ok) {
+            core.info(`No match for the ${key}`);
             return;
         }
         if (matched.value) {
@@ -428,8 +428,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 function logOutput(input) {
-    for (const key in input.keys()) {
-        core.info(`${key}: ${input.get(key)}`);
+    for (const item of input.entries()) {
+        core.info(`${item[0]}: ${item[1]}`);
     }
 }
 exports.logOutput = logOutput;
