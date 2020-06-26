@@ -9,8 +9,8 @@ function run(): void {
 
     const params = new ParameterMapList(map)
     const matched = params.match(key)
-    if (matched.ok) {
-      core.info(`No match for the ${key} key`)
+    if (!matched.ok) {
+      core.info(`No match for the ${key}`)
       return
     }
     if (matched.value) {
