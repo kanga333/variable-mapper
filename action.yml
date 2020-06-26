@@ -2,9 +2,11 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  map:
+    description: 'parameter map'
+    default: ''
+  key:
+    description: 'iparameter key'
 runs:
   using: 'node12'
   main: 'dist/index.js'

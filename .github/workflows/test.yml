@@ -20,4 +20,17 @@ jobs:
     - uses: actions/checkout@v1
     - uses: ./
       with: 
-        milliseconds: 1000
+        map: |
+          {
+            "keyA": {
+              "env1A": "value1A",
+              "env2A": "value2A",
+              "env3A": "value3A"
+            },
+            "keyB": {
+              "env1B": "value1B",
+              "env2B": "value2B",
+              "env3B": "value3B"
+            }
+          }
+        key: "keyB"

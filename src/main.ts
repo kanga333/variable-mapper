@@ -1,16 +1,21 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {ParameterMapList} from './map'
+import {logOutput} from './output'
 
-async function run(): Promise<void> {
+function run(): void {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const map: string = core.getInput('map')
+    const key: string = core.getInput('key')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    const params = new ParameterMapList(map)
+    const matched = params.match(key)
+    if (matched.ok) {
+      core.info(`No match for the ${key} key`)
+      return
+    }
+    if (matched.value) {
+      logOutput(matched.value)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
