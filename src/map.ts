@@ -16,7 +16,7 @@ class ParameterMap {
     }
 }
 
-class ParameterMapList {
+export class ParameterMapList {
     prams: ParameterMap[];
 
     constructor(raw_json: string) {
