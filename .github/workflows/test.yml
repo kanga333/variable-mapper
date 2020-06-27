@@ -19,7 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: ./
-      with: 
+      id: run_action
+      with:
+        key: "keyB"
         map: |
           {
             "keyA": {
@@ -33,4 +35,11 @@ jobs:
               "env3B": "value3B"
             }
           }
-        key: "keyB"
+    - name: 'Test Actions Parameters'
+      run: |
+        test "${{env.env1B}}" = "value1B"
+        test "${{env.env2B}}" = "value2B"
+        test "${{env.env3B}}" = "value3B"
+        test "${{steps.run_action.outputs.env1B}}" = "value1B"
+        test "${{steps.run_action.outputs.env2B}}" = "value2B"
+        test "${{steps.run_action.outputs.env3B}}" = "value3B"

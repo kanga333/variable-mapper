@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {ParameterMapList} from './map'
-import {logOutput} from './output'
+import {logOutput, envOutput, outputOutput} from './output'
 
 function run(): void {
   try {
@@ -13,8 +13,11 @@ function run(): void {
       core.info(`No match for the ${key}`)
       return
     }
+    // TODO: logging matched key
     if (matched.value) {
       logOutput(matched.value)
+      envOutput(matched.value)
+      outputOutput(matched.value)
     }
   } catch (error) {
     core.setFailed(error.message)

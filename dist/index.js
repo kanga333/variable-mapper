@@ -76,8 +76,11 @@ function run() {
             core.info(`No match for the ${key}`);
             return;
         }
+        // TODO: logging matched key
         if (matched.value) {
             output_1.logOutput(matched.value);
+            output_1.envOutput(matched.value);
+            output_1.outputOutput(matched.value);
         }
     }
     catch (error) {
@@ -433,6 +436,18 @@ function logOutput(input) {
     }
 }
 exports.logOutput = logOutput;
+function envOutput(input) {
+    for (const item of input.entries()) {
+        core.exportVariable(item[0], item[1]);
+    }
+}
+exports.envOutput = envOutput;
+function outputOutput(input) {
+    for (const item of input.entries()) {
+        core.setOutput(item[0], item[1]);
+    }
+}
+exports.outputOutput = outputOutput;
 
 
 /***/ }),
