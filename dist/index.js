@@ -72,16 +72,14 @@ function run() {
         const key = core.getInput('key');
         const params = new map_1.ParameterMapList(map);
         const matched = params.match(key);
-        if (!matched.ok) {
+        if (!matched) {
             core.info(`No match for the ${key}`);
             return;
         }
-        // TODO: logging matched key
-        if (matched.value) {
-            output_1.logOutput(matched.value);
-            output_1.envOutput(matched.value);
-            output_1.outputOutput(matched.value);
-        }
+        core.info(`${key} matches condition ${matched.key}`);
+        output_1.logOutput(matched.value);
+        output_1.envOutput(matched.value);
+        output_1.outputOutput(matched.value);
     }
     catch (error) {
         core.setFailed(error.message);
@@ -106,9 +104,9 @@ class ParameterMap {
     match(key) {
         //TODO: regex match
         if (this.key === key) {
-            return { ok: true, value: this.value };
+            return true;
         }
-        return { ok: false };
+        return false;
     }
 }
 class ParameterMapList {
@@ -128,12 +126,11 @@ class ParameterMapList {
     }
     match(key) {
         for (const param of this.prams) {
-            const matched = param.match(key);
-            if (matched.ok) {
-                return matched;
+            const ok = param.match(key);
+            if (ok) {
+                return param;
             }
         }
-        return { ok: false };
     }
 }
 exports.ParameterMapList = ParameterMapList;

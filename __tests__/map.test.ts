@@ -4,6 +4,9 @@ import {ParameterMapList} from '../src/map'
 test('match', () => {
   const params = new ParameterMapList('{"key":{"env":"value"}}')
   const got = params.match('key')
-  expect(got.ok).toBe(true)
+  if (!got) {
+    throw new Error('No match')
+  }
+  expect(got.key).toBe('key')
   expect(got.value).toMatchObject(new Map([['env', 'value']]))
 })

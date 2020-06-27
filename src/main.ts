@@ -9,16 +9,15 @@ function run(): void {
 
     const params = new ParameterMapList(map)
     const matched = params.match(key)
-    if (!matched.ok) {
+    if (!matched) {
       core.info(`No match for the ${key}`)
       return
     }
-    // TODO: logging matched key
-    if (matched.value) {
-      logOutput(matched.value)
-      envOutput(matched.value)
-      outputOutput(matched.value)
-    }
+    core.info(`${key} matches condition ${matched.key}`)
+
+    logOutput(matched.value)
+    envOutput(matched.value)
+    outputOutput(matched.value)
   } catch (error) {
     core.setFailed(error.message)
   }

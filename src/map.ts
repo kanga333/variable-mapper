@@ -7,12 +7,12 @@ class ParameterMap {
     this.value = value
   }
 
-  match(key: string): {ok: boolean; value?: Map<string, string>} {
+  match(key: string): boolean {
     //TODO: regex match
     if (this.key === key) {
-      return {ok: true, value: this.value}
+      return true
     }
-    return {ok: false}
+    return false
   }
 }
 
@@ -34,13 +34,12 @@ export class ParameterMapList {
     this.prams = ps
   }
 
-  match(key: string): {ok: boolean; value?: Map<string, string>} {
+  match(key: string): ParameterMap | undefined {
     for (const param of this.prams) {
-      const matched = param.match(key)
-      if (matched.ok) {
-        return matched
+      const ok = param.match(key)
+      if (ok) {
+        return param
       }
     }
-    return {ok: false}
   }
 }
