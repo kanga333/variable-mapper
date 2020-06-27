@@ -8,11 +8,7 @@ class ParameterMap {
   }
 
   match(key: string): boolean {
-    //TODO: regex match
-    if (this.key === key) {
-      return true
-    }
-    return false
+    return Boolean(key.match(this.key))
   }
 }
 

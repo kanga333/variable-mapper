@@ -102,11 +102,7 @@ class ParameterMap {
         this.value = value;
     }
     match(key) {
-        //TODO: regex match
-        if (this.key === key) {
-            return true;
-        }
-        return false;
+        return Boolean(key.match(this.key));
     }
 }
 class ParameterMapList {
