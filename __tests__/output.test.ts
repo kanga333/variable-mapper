@@ -1,35 +1,14 @@
 import * as os from 'os'
-import * as output from '../src/output'
+import * as exporter from '../src/exporter'
 
-const input = new Map([
-  ['env1', 'value1'],
-  ['env2', 'value2']
-])
-
-describe('output', () => {
+describe('exporter', () => {
   beforeEach(() => {
     process.stdout.write = jest.fn()
   })
 
-  it('logOutput can output log', () => {
-    output.logOutput(input)
-    assertWriteCalls([`env1: value1${os.EOL}`, `env2: value2${os.EOL}`])
-  })
-
-  it('envOutput can output env', () => {
-    output.envOutput(input)
-    assertWriteCalls([
-      `::set-env name=env1,::value1${os.EOL}`,
-      `::set-env name=env2,::value2${os.EOL}`
-    ])
-  })
-
-  it('outputOutput can output output', () => {
-    output.outputOutput(input)
-    assertWriteCalls([
-      `::set-output name=env1,::value1${os.EOL}`,
-      `::set-output name=env2,::value2${os.EOL}`
-    ])
+  it('exportLog can export log', () => {
+    exporter.exportLog('key', 'value')
+    assertWriteCalls([`export key: value${os.EOL}`])
   })
 })
 

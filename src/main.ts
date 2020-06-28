@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {ParameterMapList} from './map'
-import {logOutput, envOutput, outputOutput} from './output'
+import {exportLog} from './exporter'
 
 function run(): void {
   try {
@@ -14,10 +14,9 @@ function run(): void {
       return
     }
     core.info(`${key} matches condition ${matched.key}`)
-
-    logOutput(matched.value)
-    envOutput(matched.value)
-    outputOutput(matched.value)
+    matched.export(exportLog)
+    matched.export(core.setOutput)
+    matched.export(core.exportVariable)
   } catch (error) {
     core.setFailed(error.message)
   }

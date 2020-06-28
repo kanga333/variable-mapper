@@ -43,6 +43,28 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
+/***/ 41:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+function exportLog(name, val) {
+    core.info(`export ${name}: ${val}`);
+}
+exports.exportLog = exportLog;
+
+
+/***/ }),
+
 /***/ 87:
 /***/ (function(module) {
 
@@ -65,7 +87,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const map_1 = __webpack_require__(301);
-const output_1 = __webpack_require__(490);
+const exporter_1 = __webpack_require__(41);
 function run() {
     try {
         const map = core.getInput('map');
@@ -77,9 +99,9 @@ function run() {
             return;
         }
         core.info(`${key} matches condition ${matched.key}`);
-        output_1.logOutput(matched.value);
-        output_1.envOutput(matched.value);
-        output_1.outputOutput(matched.value);
+        matched.export(exporter_1.exportLog);
+        matched.export(core.setOutput);
+        matched.export(core.exportVariable);
     }
     catch (error) {
         core.setFailed(error.message);
@@ -104,6 +126,11 @@ class ParameterMap {
     }
     match(key) {
         return Boolean(key.match(this.key));
+    }
+    export(fn) {
+        for (const entry of this.value.entries()) {
+            fn(entry[0], entry[1]);
+        }
     }
 }
 class ParameterMapList {
@@ -414,42 +441,6 @@ function getState(name) {
 }
 exports.getState = getState;
 //# sourceMappingURL=core.js.map
-
-/***/ }),
-
-/***/ 490:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
-function logOutput(input) {
-    for (const item of input.entries()) {
-        core.info(`${item[0]}: ${item[1]}`);
-    }
-}
-exports.logOutput = logOutput;
-function envOutput(input) {
-    for (const item of input.entries()) {
-        core.exportVariable(item[0], item[1]);
-    }
-}
-exports.envOutput = envOutput;
-function outputOutput(input) {
-    for (const item of input.entries()) {
-        core.setOutput(item[0], item[1]);
-    }
-}
-exports.outputOutput = outputOutput;
-
 
 /***/ }),
 

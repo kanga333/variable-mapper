@@ -1,3 +1,5 @@
+import {ExportFunc} from './exporter'
+
 class ParameterMap {
   key: string
   value: Map<string, string>
@@ -11,6 +13,12 @@ class ParameterMap {
 
   match(key: string): boolean {
     return Boolean(key.match(this.key))
+  }
+
+  export(fn: ExportFunc): void {
+    for (const entry of this.value.entries()) {
+      fn(entry[0], entry[1])
+    }
   }
 }
 
