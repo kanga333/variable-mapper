@@ -57,6 +57,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
+function getExporters(input) {
+    const targets = input.split(',');
+    const exporters = new Array();
+    for (const target of targets) {
+        switch (target) {
+            case 'log':
+                exporters.push(exportLog);
+                break;
+            case 'env':
+                exporters.push(core.exportVariable);
+                break;
+            case 'output':
+                exporters.push(core.setOutput);
+                break;
+            default:
+                throw new Error(`Unexpected export type: ${target}`);
+        }
+    }
+    return exporters;
+}
+exports.getExporters = getExporters;
 function exportLog(name, val) {
     core.info(`export ${name}: ${val}`);
 }
@@ -72,47 +93,7 @@ module.exports = require("os");
 
 /***/ }),
 
-/***/ 198:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
-const map_1 = __webpack_require__(301);
-const exporter_1 = __webpack_require__(41);
-function run() {
-    try {
-        const map = core.getInput('map');
-        const key = core.getInput('key');
-        const params = new map_1.JSONMapper(map);
-        const matched = params.match(key);
-        if (!matched) {
-            core.info(`No match for the ${key}`);
-            return;
-        }
-        core.info(`${key} matches condition ${matched.key}`);
-        matched.export(exporter_1.exportLog);
-        matched.export(core.setOutput);
-        matched.export(core.exportVariable);
-    }
-    catch (error) {
-        core.setFailed(error.message);
-    }
-}
-run();
-
-
-/***/ }),
-
-/***/ 301:
+/***/ 96:
 /***/ (function(__unusedmodule, exports) {
 
 "use strict";
@@ -135,7 +116,7 @@ class KeyVariablesPair {
 }
 class JSONMapper {
     constructor(rawJSON) {
-        const ps = new Array();
+        const tmpPairs = new Array();
         const parsed = JSON.parse(rawJSON);
         const minify = rawJSON.replace(/\s/g, '');
         //TODO: validation
@@ -149,14 +130,14 @@ class JSONMapper {
                 values.set(val, parsed[key][val]);
             }
             const p = new KeyVariablesPair(key, values, idx);
-            ps.push(p);
+            tmpPairs.push(p);
         }
-        this.prams = ps.sort(function (a, b) {
+        this.pairs = tmpPairs.sort(function (a, b) {
             return a.idx - b.idx;
         });
     }
     match(key) {
-        for (const param of this.prams) {
+        for (const param of this.pairs) {
             const ok = param.match(key);
             if (ok) {
                 return param;
@@ -165,6 +146,48 @@ class JSONMapper {
     }
 }
 exports.JSONMapper = JSONMapper;
+
+
+/***/ }),
+
+/***/ 198:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const mapper_1 = __webpack_require__(96);
+const exporter_1 = __webpack_require__(41);
+function run() {
+    try {
+        const map = core.getInput('map');
+        const key = core.getInput('key');
+        const to = core.getInput('export_to');
+        const params = new mapper_1.JSONMapper(map);
+        const matched = params.match(key);
+        if (!matched) {
+            core.info(`No match for the ${key}`);
+            return;
+        }
+        core.info(`${key} matches condition ${matched.key}`);
+        const exporters = exporter_1.getExporters(to);
+        for (const exporter of exporters) {
+            matched.export(exporter);
+        }
+    }
+    catch (error) {
+        core.setFailed(error.message);
+    }
+}
+run();
 
 
 /***/ }),

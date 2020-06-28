@@ -40,6 +40,7 @@ jobs:
               "env3C": "value3C"
             }
           }
+        export_to: log,env,output
     - name: 'Test Actions Parameters'
       run: |
         test "${{env.env1B}}" = "value1B"

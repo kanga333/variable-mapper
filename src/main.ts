@@ -1,11 +1,12 @@
 import * as core from '@actions/core'
 import {JSONMapper} from './mapper'
-import {exportLog} from './exporter'
+import {getExporters} from './exporter'
 
 function run(): void {
   try {
     const map: string = core.getInput('map')
     const key: string = core.getInput('key')
+    const to: string = core.getInput('export_to')
 
     const params = new JSONMapper(map)
     const matched = params.match(key)
@@ -14,9 +15,11 @@ function run(): void {
       return
     }
     core.info(`${key} matches condition ${matched.key}`)
-    matched.export(exportLog)
-    matched.export(core.setOutput)
-    matched.export(core.exportVariable)
+
+    const exporters = getExporters(to)
+    for (const exporter of exporters) {
+      matched.export(exporter)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
