@@ -97,9 +97,10 @@ run();
 
 Object.defineProperty(exports, "__esModule", { value: true });
 class ParameterMap {
-    constructor(key, value) {
+    constructor(key, value, idx) {
         this.key = key;
         this.value = value;
+        this.idx = idx;
     }
     match(key) {
         return Boolean(key.match(this.key));
@@ -109,16 +110,23 @@ class ParameterMapList {
     constructor(rawJSON) {
         const ps = new Array();
         const parsed = JSON.parse(rawJSON);
+        const minify = rawJSON.replace(/\s/g, '');
         //TODO: validation
         for (const key in parsed) {
             const values = new Map();
+            const idx = minify.indexOf(`"${key}":{`);
+            if (idx === -1) {
+                throw new Error(`Failed to get key index of ${key}`);
+            }
             for (const val in parsed[key]) {
                 values.set(val, parsed[key][val]);
             }
-            const p = new ParameterMap(key, values);
+            const p = new ParameterMap(key, values, idx);
             ps.push(p);
         }
-        this.prams = ps;
+        this.prams = ps.sort(function (a, b) {
+            return a.idx - b.idx;
+        });
     }
     match(key) {
         for (const param of this.prams) {

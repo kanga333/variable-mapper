@@ -29,10 +29,15 @@ jobs:
               "env2A": "value2A",
               "env3A": "value3A"
             },
-            ".*": {
+            "...B": {
               "env1B": "value1B",
               "env2B": "value2B",
               "env3B": "value3B"
+            },
+            ".*": {
+              "env1C": "value1C",
+              "env2C": "value2C",
+              "env3C": "value3C"
             }
           }
     - name: 'Test Actions Parameters'
