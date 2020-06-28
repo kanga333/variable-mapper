@@ -14,7 +14,7 @@ function run(): void {
       core.info(`No match for the ${key}`)
       return
     }
-    core.info(`${key} matches condition ${matched.key}`)
+    core.info(`${key} matches regular expression ${matched.key}`)
 
     const exporters = getExporters(to)
     for (const exporter of exporters) {
