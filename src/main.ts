@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {ParameterMapList} from './map'
+import {JSONMapper} from './mapper'
 import {exportLog} from './exporter'
 
 function run(): void {
@@ -7,7 +7,7 @@ function run(): void {
     const map: string = core.getInput('map')
     const key: string = core.getInput('key')
 
-    const params = new ParameterMapList(map)
+    const params = new JSONMapper(map)
     const matched = params.match(key)
     if (!matched) {
       core.info(`No match for the ${key}`)

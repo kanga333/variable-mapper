@@ -1,23 +1,23 @@
-import {ParameterMapList} from '../src/map'
+import {JSONMapper} from '../src/mapper'
 
-describe('ParameterMapList', () => {
-  const list = new ParameterMapList(
+describe('JSONMapper', () => {
+  const mapper = new JSONMapper(
     '{"k.y":{"env1":"value1"},".*":{"env2":"value2"}}'
   )
 
-  it('ParameterMapList holds the order of keys', () => {
+  it('JSONMapper holds the order of keys', () => {
     const expects = ['k.y', '.*']
-    for (const [index, param] of list.prams.entries()) {
-      expect(param.key).toBe(expects[index])
+    for (const [index, pair] of mapper.pairs.entries()) {
+      expect(pair.key).toBe(expects[index])
     }
   })
 
-  it('ParameterMapList can be matched with regular expressions', () => {
-    const got = list.match('key')
+  it('JSONMapper can be matched with regular expressions', () => {
+    const got = mapper.match('key')
     if (!got) {
       throw new Error('No match')
     }
     expect(got.key).toBe('k.y')
-    expect(got.value).toMatchObject(new Map([['env1', 'value1']]))
+    expect(got.variables).toMatchObject(new Map([['env1', 'value1']]))
   })
 })

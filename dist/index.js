@@ -92,7 +92,7 @@ function run() {
     try {
         const map = core.getInput('map');
         const key = core.getInput('key');
-        const params = new map_1.ParameterMapList(map);
+        const params = new map_1.JSONMapper(map);
         const matched = params.match(key);
         if (!matched) {
             core.info(`No match for the ${key}`);
@@ -118,22 +118,22 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-class ParameterMap {
-    constructor(key, value, idx) {
+class KeyVariablesPair {
+    constructor(key, variables, idx) {
         this.key = key;
-        this.value = value;
+        this.variables = variables;
         this.idx = idx;
     }
     match(key) {
         return Boolean(key.match(this.key));
     }
     export(fn) {
-        for (const entry of this.value.entries()) {
-            fn(entry[0], entry[1]);
+        for (const variable of this.variables.entries()) {
+            fn(variable[0], variable[1]);
         }
     }
 }
-class ParameterMapList {
+class JSONMapper {
     constructor(rawJSON) {
         const ps = new Array();
         const parsed = JSON.parse(rawJSON);
@@ -148,7 +148,7 @@ class ParameterMapList {
             for (const val in parsed[key]) {
                 values.set(val, parsed[key][val]);
             }
-            const p = new ParameterMap(key, values, idx);
+            const p = new KeyVariablesPair(key, values, idx);
             ps.push(p);
         }
         this.prams = ps.sort(function (a, b) {
@@ -164,7 +164,7 @@ class ParameterMapList {
         }
     }
 }
-exports.ParameterMapList = ParameterMapList;
+exports.JSONMapper = JSONMapper;
 
 
 /***/ }),

@@ -1,13 +1,13 @@
 import {ExportFunc} from './exporter'
 
-class ParameterMap {
+class KeyVariablesPair {
   key: string
-  value: Map<string, string>
+  variables: Map<string, string>
   idx: number
 
-  constructor(key: string, value: Map<string, string>, idx: number) {
+  constructor(key: string, variables: Map<string, string>, idx: number) {
     this.key = key
-    this.value = value
+    this.variables = variables
     this.idx = idx
   }
 
@@ -16,17 +16,17 @@ class ParameterMap {
   }
 
   export(fn: ExportFunc): void {
-    for (const entry of this.value.entries()) {
-      fn(entry[0], entry[1])
+    for (const variable of this.variables.entries()) {
+      fn(variable[0], variable[1])
     }
   }
 }
 
-export class ParameterMapList {
-  prams: ParameterMap[]
+export class JSONMapper {
+  pairs: KeyVariablesPair[]
 
   constructor(rawJSON: string) {
-    const ps = new Array<ParameterMap>()
+    const tmpPairs = new Array<KeyVariablesPair>()
     const parsed = JSON.parse(rawJSON)
     const minify = rawJSON.replace(/\s/g, '')
     //TODO: validation
@@ -39,16 +39,16 @@ export class ParameterMapList {
       for (const val in parsed[key]) {
         values.set(val, parsed[key][val])
       }
-      const p = new ParameterMap(key, values, idx)
-      ps.push(p)
+      const p = new KeyVariablesPair(key, values, idx)
+      tmpPairs.push(p)
     }
-    this.prams = ps.sort(function(a, b) {
+    this.pairs = tmpPairs.sort(function(a, b) {
       return a.idx - b.idx
     })
   }
 
-  match(key: string): ParameterMap | undefined {
-    for (const param of this.prams) {
+  match(key: string): KeyVariablesPair | undefined {
+    for (const param of this.pairs) {
       const ok = param.match(key)
       if (ok) {
         return param
