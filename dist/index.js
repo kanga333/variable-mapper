@@ -177,7 +177,7 @@ function run() {
             core.info(`No match for the ${key}`);
             return;
         }
-        core.info(`${key} matches condition ${matched.key}`);
+        core.info(`${key} matches regular expression ${matched.key}`);
         const exporters = exporter_1.getExporters(to);
         for (const exporter of exporters) {
             matched.export(exporter);
