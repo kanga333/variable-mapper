@@ -6,6 +6,11 @@ describe('exporter', () => {
     process.stdout.write = jest.fn()
   })
 
+  it('getExporters can get exporters', () => {
+    let exporters = exporter.getExporters('log,env,output')
+    expect(exporters.length).toBe(3)
+  })
+
   it('exportLog can export log', () => {
     exporter.exportLog('key', 'value')
     assertWriteCalls([`export key: value${os.EOL}`])
