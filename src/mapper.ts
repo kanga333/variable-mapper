@@ -1,4 +1,5 @@
 import {ExportFunc} from './exporter'
+import Ajv from 'ajv'
 
 class KeyVariablesPair {
   key: string
@@ -22,6 +23,14 @@ class KeyVariablesPair {
   }
 }
 
+const schema = {
+  type: 'object',
+  additionalProperties: {
+    type: 'object',
+    additionalProperties: {type: 'string'}
+  }
+}
+
 export class JSONMapper {
   pairs: KeyVariablesPair[]
 
@@ -29,7 +38,9 @@ export class JSONMapper {
     const tmpPairs = new Array<KeyVariablesPair>()
     const parsed = JSON.parse(rawJSON)
     const minify = rawJSON.replace(/\s/g, '')
-    //TODO: validation
+    const ajv = new Ajv()
+    const valid = ajv.validate(schema, parsed)
+    if (!valid) throw new Error(`Validation failed ${ajv.errorsText()}`)
     for (const key in parsed) {
       const values = new Map<string, string>()
       const idx = minify.indexOf(`"${key}":{`)

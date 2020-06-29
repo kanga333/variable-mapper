@@ -20,4 +20,10 @@ describe('JSONMapper', () => {
     expect(got.key).toBe('k.y')
     expect(got.variables).toMatchObject(new Map([['env1', 'value1']]))
   })
+
+  it('JSONMapper should throw an exception on invalid input', () => {
+    expect(() => {
+      new JSONMapper('{"invalid":"schema"}')
+    }).toThrow()
+  })
 })
