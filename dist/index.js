@@ -379,28 +379,43 @@ class KeyVariablesPair {
         }
     }
 }
-const schema = {
+class Mapper {
+    validate(input) {
+        const ajv = new ajv_1.default();
+        const valid = ajv.validate(Mapper.schema, input);
+        if (!valid)
+            throw new Error(`Validation failed: ${ajv.errorsText()}`);
+    }
+    match(key) {
+        for (const param of this.pairs) {
+            const ok = param.match(key);
+            if (ok) {
+                return param;
+            }
+        }
+    }
+}
+Mapper.schema = {
     type: 'object',
     additionalProperties: {
         type: 'object',
         additionalProperties: { type: 'string' }
     }
 };
-class JSONMapper {
+class JSONMapper extends Mapper {
     constructor(rawJSON) {
-        const tmpPairs = new Array();
+        super();
         const parsed = JSON.parse(rawJSON);
+        this.validate(parsed);
+        const tmpPairs = new Array();
         const minify = rawJSON.replace(/\s/g, '');
-        const ajv = new ajv_1.default();
-        const valid = ajv.validate(schema, parsed);
-        if (!valid)
-            throw new Error(`Validation failed ${ajv.errorsText()}`);
         for (const key in parsed) {
-            const values = new Map();
+            //Gets the position of the input keys to keep their order.
             const idx = minify.indexOf(`"${key}":{`);
             if (idx === -1) {
                 throw new Error(`Failed to get key index of ${key}`);
             }
+            const values = new Map();
             for (const val in parsed[key]) {
                 values.set(val, parsed[key][val]);
             }
@@ -410,14 +425,6 @@ class JSONMapper {
         this.pairs = tmpPairs.sort(function (a, b) {
             return a.idx - b.idx;
         });
-    }
-    match(key) {
-        for (const param of this.pairs) {
-            const ok = param.match(key);
-            if (ok) {
-                return param;
-            }
-        }
     }
 }
 exports.JSONMapper = JSONMapper;
