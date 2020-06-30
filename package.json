@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "map",
+  "version": "0.0.1",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Github Action for mapping variables by a specific key",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,17 +15,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/kanga333/map.git"
   },
   "keywords": [
-    "actions",
-    "node",
-    "setup"
+    "actions"
   ],
   "author": "YourNameOrOrganization",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.0"
+    "@actions/core": "^1.2.0",
+    "ajv": "^6.12.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
