@@ -1,11 +1,11 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'map'
+description: 'Github Action for mapping variables by a specific key'
+author: 'kanga333'
 inputs:
   key:
-    description: 'iparameter key'
+    description: 'Key to match the map argument'
   map:
-    description: 'parameter map'
+    description: 'Pairs of regular expressions and variables'
     default: ''
   export_to:
     description: 'Comma-separated list of targets to export variables to. log, env and output are valid values.'
