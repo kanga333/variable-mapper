@@ -1,4 +1,4 @@
-name: 'map'
+name: 'variable-mapper'
 description: 'Github Action for mapping variables by a specific key'
 author: 'kanga333'
 inputs:

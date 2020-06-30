@@ -1,10 +1,12 @@
-# Github Action for mapping variables by a specific key <a href="https://github.com/kanga333/map/actions"><img alt="map status" src="https://github.com/actions/kanga333/map/build-test/badge.svg"></a>
+# Github Action for mapping variables by a specific key
 
-MAP action maps variables by regular expressions.
+![build-test](https://github.com/kanga333/variable-mapper/workflows/build-test/badge.svg)
+
+Variable-Mapper action maps variables by regular expressions.
 
 - The map argument is a configuration in json format.
   - The top-level key in JSON is a regular expression condition. They are evaluated in order from the top.
-  - The value corresponding to the regular expression is the key-value pair of variables to be exported.
+  - The value is the key-value pair of variables to be exported.
 - The key argument is the key to match the map.
 
 ## Sample Workflows
@@ -18,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: kanga333/map@v1 
+    - uses: kanga333/variable-mapper@v1 
       with:
         key: ${{GITHUB_REF#refs/heads/}}
         map: |
@@ -54,7 +56,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: kanga333/map@v1 
+    - uses: kanga333/variable-mapper@v1 
       id: export
       with:
         key: ${{GITHUB_REF#refs/heads/}}
