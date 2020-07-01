@@ -49,3 +49,21 @@ jobs:
         test "${{steps.run_action.outputs.env1B}}" = "value1B"
         test "${{steps.run_action.outputs.env2B}}" = "value2B"
         test "${{steps.run_action.outputs.env3B}}" = "value3B"
+  example: # Test README use case
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./
+      id: run_action
+      with:
+        key: "${{ github.base_ref }}"
+        map: |
+          {
+            "master": {
+              "example": "${{secrets.EXAMPLE}}"
+            }
+          }
+        export_to: env
+    - name: 'Test Actions Parameters'
+      run: |
+        test "${{env.example}}" = "example"
