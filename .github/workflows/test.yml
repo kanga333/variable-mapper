@@ -56,10 +56,10 @@ jobs:
     - uses: ./
       id: run_action
       with:
-        key: "${{ github.base_ref }}"
+        key: "${{ github.event_name }}"
         map: |
           {
-            "master": {
+            "push|pull_request": {
               "example": "${{secrets.EXAMPLE}}"
             }
           }
