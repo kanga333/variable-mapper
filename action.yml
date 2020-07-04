@@ -1,5 +1,8 @@
 name: 'variable-mapper'
 description: 'Github Action for mapping variables by a specific key'
+branding:
+  color: green
+  icon: arrow-right
 author: 'kanga333'
 inputs:
   key:
