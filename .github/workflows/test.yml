@@ -67,3 +67,50 @@ jobs:
     - name: 'Test Actions Parameters'
       run: |
         test "${{env.example}}" = "example"
+  test-readme-example1:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: kanga333/variable-mapper@v0.1.0
+      with:
+        key: "${{github.base_ref}}"
+        map: |
+          {
+            "master": {
+              "environment": "production",
+              "AWS_ACCESS_KEY_ID": "${{ secrets.PROD_AWS_ACCESS_KEY_ID }}",
+              "AWS_SECRET_ACCESS_KEY": "${{ secrets.PROD_AWS_ACCESS_KEY_ID }}"
+            },
+            "staging": {
+              "environment": "staging",
+              "AWS_ACCESS_KEY_ID": "${{ secrets.STG_AWS_ACCESS_KEY_ID }}",
+              "AWS_SECRET_ACCESS_KEY": "${{ secrets.STG_AWS_ACCESS_KEY_ID }}"
+            },
+            ".*": {
+              "environment": "development",
+              "AWS_ACCESS_KEY_ID": "${{ secrets.DEV_AWS_ACCESS_KEY_ID }}",
+              "AWS_SECRET_ACCESS_KEY": "${{ secrets.DEV_AWS_ACCESS_KEY_ID }}"
+            }
+          }
+    - name: Echo environment
+      run: echo ${{ env.environment }}
+  test-readme-example2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: kanga333/variable-mapper@v0.1.0
+      id: export
+      with:
+        key: "${{github.base_ref}}"
+        map: |
+          {
+            "master": {
+              "environment": "production"
+            },
+            ".*": {
+              "environment": "development"
+            }
+          }
+        export_to: env,log,output
+    - name: Echo environment and output
+      run: |
+        echo ${{ env.environment }}
+        echo ${{ steps.export.outputs.environment }}
