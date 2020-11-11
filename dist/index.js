@@ -405,6 +405,16 @@ class KeyVariablesPair {
         }
     }
 }
+class FirstMatch {
+    match(key, pairs) {
+        for (const param of pairs) {
+            const ok = param.match(key);
+            if (ok) {
+                return param;
+            }
+        }
+    }
+}
 class Mapper {
     validate(input) {
         const ajv = new ajv_1.default();
@@ -413,12 +423,7 @@ class Mapper {
             throw new Error(`Validation failed: ${ajv.errorsText()}`);
     }
     match(key) {
-        for (const param of this.pairs) {
-            const ok = param.match(key);
-            if (ok) {
-                return param;
-            }
-        }
+        return this.matcher.match(key, this.pairs);
     }
 }
 Mapper.schema = {
@@ -431,6 +436,7 @@ Mapper.schema = {
 class JSONMapper extends Mapper {
     constructor(rawJSON) {
         super();
+        this.matcher = new FirstMatch();
         const parsed = JSON.parse(rawJSON);
         this.validate(parsed);
         const tmpPairs = new Array();

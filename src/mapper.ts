@@ -23,6 +23,21 @@ class KeyVariablesPair {
   }
 }
 
+interface Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined
+}
+
+class FirstMatch implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    for (const param of pairs) {
+      const ok = param.match(key)
+      if (ok) {
+        return param
+      }
+    }
+  }
+}
+
 abstract class Mapper {
   static schema = {
     type: 'object',
@@ -37,23 +52,22 @@ abstract class Mapper {
     const valid = ajv.validate(Mapper.schema, input)
     if (!valid) throw new Error(`Validation failed: ${ajv.errorsText()}`)
   }
-
+  abstract matcher: Matcher
   abstract pairs: KeyVariablesPair[]
   match(key: string): KeyVariablesPair | undefined {
-    for (const param of this.pairs) {
-      const ok = param.match(key)
-      if (ok) {
-        return param
-      }
-    }
+    return this.matcher.match(key, this.pairs)
   }
 }
 
 export class JSONMapper extends Mapper {
   pairs: KeyVariablesPair[]
+  matcher: Matcher
 
   constructor(rawJSON: string) {
     super()
+
+    this.matcher = new FirstMatch()
+
     const parsed = JSON.parse(rawJSON)
     this.validate(parsed as object)
 
