@@ -21,6 +21,14 @@ class KeyVariablesPair {
       fn(variable[0], variable[1])
     }
   }
+
+  merge(kvp: KeyVariablesPair): void {
+    this.variables = new Map([
+      ...this.variables.entries(),
+      ...kvp.variables.entries()
+    ])
+    this.key = `${this.key}\n${kvp.key}`
+  }
 }
 
 interface Matcher {
@@ -35,6 +43,23 @@ class FirstMatch implements Matcher {
         return param
       }
     }
+  }
+}
+
+class Overwrite implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    let pair: KeyVariablesPair | undefined
+    for (const param of pairs) {
+      const ok = param.match(key)
+      if (ok) {
+        if (pair === undefined) {
+          pair = param
+          continue
+        }
+        pair.merge(param)
+      }
+    }
+    return pair
   }
 }
 
@@ -63,10 +88,17 @@ export class JSONMapper extends Mapper {
   pairs: KeyVariablesPair[]
   matcher: Matcher
 
-  constructor(rawJSON: string) {
+  constructor(rawJSON: string, mode: string) {
     super()
 
-    this.matcher = new FirstMatch()
+    switch (mode) {
+      case 'overwrite':
+        this.matcher = new Overwrite()
+        break
+      default:
+        this.matcher = new FirstMatch()
+        break
+    }
 
     const parsed = JSON.parse(rawJSON)
     this.validate(parsed as object)

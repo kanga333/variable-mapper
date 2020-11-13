@@ -8,7 +8,7 @@ function run(): void {
     const key: string = core.getInput('key')
     const to: string = core.getInput('export_to')
 
-    const params = new JSONMapper(map)
+    const params = new JSONMapper(map, 'first_match')
     const matched = params.match(key)
     if (!matched) {
       core.info(`No match for the ${key}`)

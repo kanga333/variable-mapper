@@ -404,6 +404,13 @@ class KeyVariablesPair {
             fn(variable[0], variable[1]);
         }
     }
+    merge(kvp) {
+        this.variables = new Map([
+            ...this.variables.entries(),
+            ...kvp.variables.entries()
+        ]);
+        this.key = `${this.key}\n${kvp.key}`;
+    }
 }
 class FirstMatch {
     match(key, pairs) {
@@ -413,6 +420,22 @@ class FirstMatch {
                 return param;
             }
         }
+    }
+}
+class Overwrite {
+    match(key, pairs) {
+        let pair;
+        for (const param of pairs) {
+            const ok = param.match(key);
+            if (ok) {
+                if (pair === undefined) {
+                    pair = param;
+                    continue;
+                }
+                pair.merge(param);
+            }
+        }
+        return pair;
     }
 }
 class Mapper {
@@ -434,9 +457,16 @@ Mapper.schema = {
     }
 };
 class JSONMapper extends Mapper {
-    constructor(rawJSON) {
+    constructor(rawJSON, mode) {
         super();
-        this.matcher = new FirstMatch();
+        switch (mode) {
+            case 'overwrite':
+                this.matcher = new Overwrite();
+                break;
+            default:
+                this.matcher = new FirstMatch();
+                break;
+        }
         const parsed = JSON.parse(rawJSON);
         this.validate(parsed);
         const tmpPairs = new Array();
@@ -662,7 +692,7 @@ function run() {
         const map = core.getInput('map');
         const key = core.getInput('key');
         const to = core.getInput('export_to');
-        const params = new mapper_1.JSONMapper(map);
+        const params = new mapper_1.JSONMapper(map, 'first_match');
         const matched = params.match(key);
         if (!matched) {
             core.info(`No match for the ${key}`);
