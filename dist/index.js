@@ -438,6 +438,22 @@ class Overwrite {
         return pair;
     }
 }
+class Fill {
+    match(key, pairs) {
+        let pair;
+        for (const param of pairs.reverse()) {
+            const ok = param.match(key);
+            if (ok) {
+                if (pair === undefined) {
+                    pair = param;
+                    continue;
+                }
+                pair.merge(param);
+            }
+        }
+        return pair;
+    }
+}
 class Mapper {
     validate(input) {
         const ajv = new ajv_1.default();
@@ -462,6 +478,9 @@ class JSONMapper extends Mapper {
         switch (mode) {
             case 'overwrite':
                 this.matcher = new Overwrite();
+                break;
+            case 'fill':
+                this.matcher = new Fill();
                 break;
             default:
                 this.matcher = new FirstMatch();

@@ -48,4 +48,25 @@ describe('JSONMapper', () => {
       )
     })
   })
+
+  describe('Fill Matcher', () => {
+    const overwrite = new JSONMapper(
+      '{"k.y":{"env1":"value1"},".*":{"env1":"not_overwrite", "env2":"fill"}}',
+      'fill'
+    )
+
+    it('Overwrite Matcher can match and overwrite multiple values', () => {
+      const got = overwrite.match('key')
+      if (!got) {
+        throw new Error('No match')
+      }
+      expect(got.key).toBe('.*\nk.y')
+      expect(got.variables).toMatchObject(
+        new Map([
+          ['env1', 'value1'],
+          ['env2', 'fill']
+        ])
+      )
+    })
+  })
 })

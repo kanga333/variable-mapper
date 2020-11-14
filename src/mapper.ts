@@ -63,6 +63,23 @@ class Overwrite implements Matcher {
   }
 }
 
+class Fill implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    let pair: KeyVariablesPair | undefined
+    for (const param of pairs.reverse()) {
+      const ok = param.match(key)
+      if (ok) {
+        if (pair === undefined) {
+          pair = param
+          continue
+        }
+        pair.merge(param)
+      }
+    }
+    return pair
+  }
+}
+
 abstract class Mapper {
   static schema = {
     type: 'object',
@@ -94,6 +111,9 @@ export class JSONMapper extends Mapper {
     switch (mode) {
       case 'overwrite':
         this.matcher = new Overwrite()
+        break
+      case 'fill':
+        this.matcher = new Fill()
         break
       default:
         this.matcher = new FirstMatch()
