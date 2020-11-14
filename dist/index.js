@@ -476,6 +476,9 @@ class JSONMapper extends Mapper {
     constructor(rawJSON, mode) {
         super();
         switch (mode) {
+            case 'first_match':
+                this.matcher = new FirstMatch();
+                break;
             case 'overwrite':
                 this.matcher = new Overwrite();
                 break;
@@ -483,8 +486,7 @@ class JSONMapper extends Mapper {
                 this.matcher = new Fill();
                 break;
             default:
-                this.matcher = new FirstMatch();
-                break;
+                throw new Error(`Unexpected mode: ${mode}`);
         }
         const parsed = JSON.parse(rawJSON);
         this.validate(parsed);
@@ -711,7 +713,8 @@ function run() {
         const map = core.getInput('map');
         const key = core.getInput('key');
         const to = core.getInput('export_to');
-        const params = new mapper_1.JSONMapper(map, 'first_match');
+        const mode = core.getInput('mode');
+        const params = new mapper_1.JSONMapper(map, mode);
         const matched = params.match(key);
         if (!matched) {
             core.info(`No match for the ${key}`);

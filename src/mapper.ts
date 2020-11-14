@@ -109,6 +109,9 @@ export class JSONMapper extends Mapper {
     super()
 
     switch (mode) {
+      case 'first_match':
+        this.matcher = new FirstMatch()
+        break
       case 'overwrite':
         this.matcher = new Overwrite()
         break
@@ -116,8 +119,7 @@ export class JSONMapper extends Mapper {
         this.matcher = new Fill()
         break
       default:
-        this.matcher = new FirstMatch()
-        break
+        throw new Error(`Unexpected mode: ${mode}`)
     }
 
     const parsed = JSON.parse(rawJSON)

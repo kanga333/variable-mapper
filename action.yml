@@ -13,6 +13,9 @@ inputs:
   export_to:
     description: 'Comma-separated list of targets to export variables to. log, env and output are valid values.'
     default: 'log,env'
+  mode:
+    description: 'Controls the way key and map are matched. first_match, overwrite and fill are valid values.'
+    default: 'first_match'
 runs:
   using: 'node12'
   main: 'dist/index.js'
