@@ -155,7 +155,7 @@ jobs:
         echo ${{ env.env3 }}
 ```
 
-In this workflow, `env1:value1_overwrite`, `env2:value2` and `env2:value2` export as env.
+In this workflow, `env1:value1_overwrite`, `env2:value2` and `env3:value3` export as env.
 
 #### fill mode
 
@@ -192,4 +192,4 @@ jobs:
         echo ${{ env.env3 }}
 ```
 
-In this workflow, `env1:value1`, `env2:value2` and `env2:value2` export as env.
+In this workflow, `env1:value1`, `env2:value2` and `env3:value3` export as env.
