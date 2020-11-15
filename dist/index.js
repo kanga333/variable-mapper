@@ -404,6 +404,55 @@ class KeyVariablesPair {
             fn(variable[0], variable[1]);
         }
     }
+    merge(kvp) {
+        this.variables = new Map([
+            ...this.variables.entries(),
+            ...kvp.variables.entries()
+        ]);
+        this.key = `${this.key}\n${kvp.key}`;
+    }
+}
+class FirstMatch {
+    match(key, pairs) {
+        for (const param of pairs) {
+            const ok = param.match(key);
+            if (ok) {
+                return param;
+            }
+        }
+    }
+}
+class Overwrite {
+    match(key, pairs) {
+        let pair;
+        for (const param of pairs) {
+            const ok = param.match(key);
+            if (ok) {
+                if (pair === undefined) {
+                    pair = param;
+                    continue;
+                }
+                pair.merge(param);
+            }
+        }
+        return pair;
+    }
+}
+class Fill {
+    match(key, pairs) {
+        let pair;
+        for (const param of pairs.reverse()) {
+            const ok = param.match(key);
+            if (ok) {
+                if (pair === undefined) {
+                    pair = param;
+                    continue;
+                }
+                pair.merge(param);
+            }
+        }
+        return pair;
+    }
 }
 class Mapper {
     validate(input) {
@@ -413,12 +462,7 @@ class Mapper {
             throw new Error(`Validation failed: ${ajv.errorsText()}`);
     }
     match(key) {
-        for (const param of this.pairs) {
-            const ok = param.match(key);
-            if (ok) {
-                return param;
-            }
-        }
+        return this.matcher.match(key, this.pairs);
     }
 }
 Mapper.schema = {
@@ -429,8 +473,21 @@ Mapper.schema = {
     }
 };
 class JSONMapper extends Mapper {
-    constructor(rawJSON) {
+    constructor(rawJSON, mode) {
         super();
+        switch (mode) {
+            case 'first_match':
+                this.matcher = new FirstMatch();
+                break;
+            case 'overwrite':
+                this.matcher = new Overwrite();
+                break;
+            case 'fill':
+                this.matcher = new Fill();
+                break;
+            default:
+                throw new Error(`Unexpected mode: ${mode}`);
+        }
         const parsed = JSON.parse(rawJSON);
         this.validate(parsed);
         const tmpPairs = new Array();
@@ -656,7 +713,8 @@ function run() {
         const map = core.getInput('map');
         const key = core.getInput('key');
         const to = core.getInput('export_to');
-        const params = new mapper_1.JSONMapper(map);
+        const mode = core.getInput('mode');
+        const params = new mapper_1.JSONMapper(map, mode);
         const matched = params.match(key);
         if (!matched) {
             core.info(`No match for the ${key}`);

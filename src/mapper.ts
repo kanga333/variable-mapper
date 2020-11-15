@@ -21,6 +21,63 @@ class KeyVariablesPair {
       fn(variable[0], variable[1])
     }
   }
+
+  merge(kvp: KeyVariablesPair): void {
+    this.variables = new Map([
+      ...this.variables.entries(),
+      ...kvp.variables.entries()
+    ])
+    this.key = `${this.key}\n${kvp.key}`
+  }
+}
+
+interface Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined
+}
+
+class FirstMatch implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    for (const param of pairs) {
+      const ok = param.match(key)
+      if (ok) {
+        return param
+      }
+    }
+  }
+}
+
+class Overwrite implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    let pair: KeyVariablesPair | undefined
+    for (const param of pairs) {
+      const ok = param.match(key)
+      if (ok) {
+        if (pair === undefined) {
+          pair = param
+          continue
+        }
+        pair.merge(param)
+      }
+    }
+    return pair
+  }
+}
+
+class Fill implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    let pair: KeyVariablesPair | undefined
+    for (const param of pairs.reverse()) {
+      const ok = param.match(key)
+      if (ok) {
+        if (pair === undefined) {
+          pair = param
+          continue
+        }
+        pair.merge(param)
+      }
+    }
+    return pair
+  }
 }
 
 abstract class Mapper {
@@ -37,23 +94,34 @@ abstract class Mapper {
     const valid = ajv.validate(Mapper.schema, input)
     if (!valid) throw new Error(`Validation failed: ${ajv.errorsText()}`)
   }
-
+  abstract matcher: Matcher
   abstract pairs: KeyVariablesPair[]
   match(key: string): KeyVariablesPair | undefined {
-    for (const param of this.pairs) {
-      const ok = param.match(key)
-      if (ok) {
-        return param
-      }
-    }
+    return this.matcher.match(key, this.pairs)
   }
 }
 
 export class JSONMapper extends Mapper {
   pairs: KeyVariablesPair[]
+  matcher: Matcher
 
-  constructor(rawJSON: string) {
+  constructor(rawJSON: string, mode: string) {
     super()
+
+    switch (mode) {
+      case 'first_match':
+        this.matcher = new FirstMatch()
+        break
+      case 'overwrite':
+        this.matcher = new Overwrite()
+        break
+      case 'fill':
+        this.matcher = new Fill()
+        break
+      default:
+        throw new Error(`Unexpected mode: ${mode}`)
+    }
+
     const parsed = JSON.parse(rawJSON)
     this.validate(parsed as object)
 

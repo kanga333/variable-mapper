@@ -114,3 +114,81 @@ jobs:
       run: |
         echo ${{ env.environment }}
         echo ${{ steps.export.outputs.environment }}
+  test-readme-example3:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./
+      id: export
+      with:
+        key: "first"
+        map: |
+          {
+            "first": {
+              "env1": "value1",
+              "env2": "value2"
+            },
+            ".*": {
+              "env1": "value1_overwrite",
+              "env3": "value3"
+            }
+          }
+        export_to: env
+        mode: first_match
+    - name: Echo environment and output
+      run: |
+        test "${{ env.env1 }}" = "value1"
+        test "${{ env.env2 }}" = "value2"
+        test "${{ env.env3 }}" = ""
+  test-readme-example4:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./
+      id: export
+      with:
+        key: "first"
+        map: |
+          {
+            "first": {
+              "env1": "value1",
+              "env2": "value2"
+            },
+            ".*": {
+              "env1": "value1_overwrite",
+              "env3": "value3"
+            }
+          }
+        export_to: env
+        mode: overwrite
+    - name: Echo environment and output
+      run: |
+        test "${{ env.env1 }}" = "value1_overwrite"
+        test "${{ env.env2 }}" = "value2"
+        test "${{ env.env3 }}" = "value3"
+  test-readme-example5:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./
+      id: export
+      with:
+        key: "first"
+        map: |
+          {
+            "first": {
+              "env1": "value1",
+              "env2": "value2"
+            },
+            ".*": {
+              "env1": "value1_overwrite",
+              "env3": "value3"
+            }
+          }
+        export_to: env
+        mode: fill
+    - name: Echo environment and output
+      run: |
+        test "${{ env.env1 }}" = "value1"
+        test "${{ env.env2 }}" = "value2"
+        test "${{ env.env3 }}" = "value3"

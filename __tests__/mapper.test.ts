@@ -2,7 +2,8 @@ import {JSONMapper} from '../src/mapper'
 
 describe('JSONMapper', () => {
   const mapper = new JSONMapper(
-    '{"k.y":{"env1":"value1"},".*":{"env2":"value2"}}'
+    '{"k.y":{"env1":"value1"},".*":{"env2":"value2"}}',
+    'first_match'
   )
 
   it('JSONMapper holds the order of keys', () => {
@@ -23,7 +24,49 @@ describe('JSONMapper', () => {
 
   it('JSONMapper should throw an exception on invalid input', () => {
     expect(() => {
-      new JSONMapper('{"invalid":"schema"}')
+      new JSONMapper('{"invalid":"schema"}', 'first_match')
     }).toThrow()
+  })
+
+  describe('Overwrite Matcher', () => {
+    const overwrite = new JSONMapper(
+      '{"k.y":{"env1":"value1","env2":"value2"},".*":{"env2":"overwrite"}}',
+      'overwrite'
+    )
+
+    it('Overwrite Matcher can match and overwrite multiple values', () => {
+      const got = overwrite.match('key')
+      if (!got) {
+        throw new Error('No match')
+      }
+      expect(got.key).toBe('k.y\n.*')
+      expect(got.variables).toMatchObject(
+        new Map([
+          ['env1', 'value1'],
+          ['env2', 'overwrite']
+        ])
+      )
+    })
+  })
+
+  describe('Fill Matcher', () => {
+    const overwrite = new JSONMapper(
+      '{"k.y":{"env1":"value1"},".*":{"env1":"not_overwrite", "env2":"fill"}}',
+      'fill'
+    )
+
+    it('Overwrite Matcher can match and overwrite multiple values', () => {
+      const got = overwrite.match('key')
+      if (!got) {
+        throw new Error('No match')
+      }
+      expect(got.key).toBe('.*\nk.y')
+      expect(got.variables).toMatchObject(
+        new Map([
+          ['env1', 'value1'],
+          ['env2', 'fill']
+        ])
+      )
+    })
   })
 })

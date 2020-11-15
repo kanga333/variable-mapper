@@ -77,3 +77,119 @@ jobs:
 ```
 
 The variables can be exported to log, env and output. (Default is `log,env`)
+
+### Switching the behavior of getting the variable
+
+The `mode` option can be used to change the behavior of getting variables.
+`first_match`, `overwrite` and `fill` are valid values.
+
+#### first_match mode (default)
+
+`first_match` evaluates the regular expression of a key in order from the top and gets the variable for the first key to be matched.
+
+```yaml
+on: [push]
+name: Export variables to output and environment and log
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: kanga333/variable-mapper@master
+      id: export
+      with:
+        key: "first"
+        map: |
+          {
+            "first": {
+              "env1": "value1",
+              "env2": "value2"
+            },
+            ".*": {
+              "env1": "value1_overwrite",
+              "env3": "value3"
+            }
+          }
+        export_to: env
+        mode: first_match
+    - name: Echo environment and output
+      run: |
+        echo ${{ env.env1 }}
+        echo ${{ env.env2 }}
+        echo ${{ env.env3 }}
+```
+
+In this workflow, only `env1:value1` and `env2:value2` are exported as env.
+
+#### overwrite mode
+
+`overwrite` evaluates the regular expression of the keys in order from the top, and then merges the variables associated with the matched keys in turn. If the same variable is defined, the later evaluated value is overwritten.
+
+```yaml
+on: [push]
+name: Export variables to output and environment and log
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: kanga333/variable-mapper@master
+      id: export
+      with:
+        key: "first"
+        map: |
+          {
+            "first": {
+              "env1": "value1",
+              "env2": "value2"
+            },
+            ".*": {
+              "env1": "value1_overwrite",
+              "env3": "value3"
+            }
+          }
+        export_to: env
+        mode: overwrite
+    - name: Echo environment and output
+      run: |
+        echo ${{ env.env1 }}
+        echo ${{ env.env2 }}
+        echo ${{ env.env3 }}
+```
+
+In this workflow, `env1:value1_overwrite`, `env2:value2` and `env2:value2` export as env.
+
+#### fill mode
+
+`fill` evaluates the regular expression of the keys in order from the top, and then merges the variables associated with the matched keys in turn. If the same variable is defined, later evaluated values are ignored and the first evaluated value takes precedence.
+
+```yaml
+on: [push]
+name: Export variables to output and environment and log
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: kanga333/variable-mapper@master
+      id: export
+      with:
+        key: "first"
+        map: |
+          {
+            "first": {
+              "env1": "value1",
+              "env2": "value2"
+            },
+            ".*": {
+              "env1": "value1_overwrite",
+              "env3": "value3"
+            }
+          }
+        export_to: env
+        mode: overwrite
+    - name: Echo environment and output
+      run: |
+        echo ${{ env.env1 }}
+        echo ${{ env.env2 }}
+        echo ${{ env.env3 }}
+```
+
+In this workflow, `env1:value1`, `env2:value2` and `env2:value2` export as env.
