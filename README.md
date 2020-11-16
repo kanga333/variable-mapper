@@ -89,7 +89,7 @@ The `mode` option can be used to change the behavior of getting variables.
 
 ```yaml
 on: [push]
-name: Export variables to output and environment and log
+name: Exporting variables in the first match
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -126,7 +126,7 @@ In this workflow, only `env1:value1` and `env2:value2` are exported as env.
 
 ```yaml
 on: [push]
-name: Export variables to output and environment and log
+name: Exporting variables by overwriting
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -163,7 +163,7 @@ In this workflow, `env1:value1_overwrite`, `env2:value2` and `env3:value3` expor
 
 ```yaml
 on: [push]
-name: Export variables to output and environment and log
+name: Export parameters in filling
 jobs:
   build:
     runs-on: ubuntu-latest
