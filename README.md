@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: kanga333/variable-mapper@v0.1.0
+    - uses: kanga333/variable-mapper@master
       with:
         key: "${{github.base_ref}}"
         map: |
@@ -56,7 +56,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: kanga333/variable-mapper@v0.1.0
+    - uses: kanga333/variable-mapper@master
       id: export
       with:
         key: "${{github.base_ref}}"
