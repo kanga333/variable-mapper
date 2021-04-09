@@ -141,7 +141,7 @@ export class JSONMapper extends Mapper {
       tmpPairs.push(p)
     }
 
-    this.pairs = tmpPairs.sort(function(a, b) {
+    this.pairs = tmpPairs.sort(function (a, b) {
       return a.idx - b.idx
     })
   }
