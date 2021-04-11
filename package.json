@@ -24,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "ajv": "^6.12.2"
+    "ajv": "^8.0.5"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
