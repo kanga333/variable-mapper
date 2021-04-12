@@ -1,19 +1,11 @@
-name: "build-test"
+name: "integration-test"
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
     branches:
       - master
-      - 'releases/*'
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - run: |
-        npm install
-        npm run all
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
@@ -51,6 +43,7 @@ jobs:
         test "${{steps.run_action.outputs.env3B}}" = "value3B"
   example: # Test README use case
     runs-on: ubuntu-latest
+    environment: CI
     steps:
     - uses: actions/checkout@v1
     - uses: ./
