@@ -128,8 +128,9 @@ export class JSONMapper extends Mapper {
     const tmpPairs = new Array<KeyVariablesPair>()
     const minify = rawJSON.replace(/\s/g, '')
     for (const key in parsed) {
+      const json_key = JSON.stringify(key)
       //Gets the position of the input keys to keep their order.
-      const idx = minify.indexOf(`"${key}":{`)
+      const idx = minify.indexOf(`${json_key}:{`)
       if (idx === -1) {
         throw new Error(`Failed to get key index of ${key}`)
       }
