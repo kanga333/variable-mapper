@@ -184,7 +184,7 @@ jobs:
             }
           }
         export_to: env
-        mode: overwrite
+        mode: fill
     - name: Echo environment and output
       run: |
         echo ${{ env.env1 }}
