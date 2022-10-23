@@ -22,7 +22,7 @@ function run(): void {
       matched.export(exporter)
     }
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
