@@ -1,6 +1,6 @@
 {
   "name": "variable-mapper",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "description": "Github Action for mapping variables by a specific key",
   "main": "lib/main.js",
