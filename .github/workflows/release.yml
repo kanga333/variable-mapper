@@ -22,7 +22,7 @@ jobs:
       - id: tag_check
         run: |
           git rev-parse v${{steps.version.outputs.result}} 2> /dev/null \
-            || echo '::set-output name=exist::false'
+            || echo 'exist=false' >> $GITHUB_OUTPUT
       - name: Create Release
         if: steps.tag_check.outputs.exist == 'false'
         id: create_release
