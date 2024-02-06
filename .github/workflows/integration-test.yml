@@ -166,3 +166,51 @@ jobs:
         test "${{ env.env1 }}" = "value1"
         test "${{ env.env2 }}" = "value2"
         test "${{ env.env3 }}" = "value3"
+  test-exact-match1:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./
+      id: export
+      with:
+        key: "development1"
+        map: |
+          {
+            "development1": {
+              "env1": "one",
+              "env2": "one"
+            },
+            "development10": {
+              "env1": "two",
+              "env3": "two"
+            }
+          }
+        export_to: env
+        mode: first_match
+    - name: assert
+      if: ${{ env.env1 == 'one' }}
+      run: exit 1
+  test-exact-match2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./
+      id: export
+      with:
+        key: "development10"
+        map: |
+          {
+            "development1": {
+              "env1": "one",
+              "env2": "one"
+            },
+            "development10": {
+              "env1": "two",
+              "env3": "two"
+            }
+          }
+        export_to: env
+        mode: first_match
+    - name: assert
+      if: ${{ env.env1 == 'two' }}
+      run: exit 1

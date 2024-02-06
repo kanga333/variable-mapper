@@ -46,6 +46,17 @@ class FirstMatch implements Matcher {
   }
 }
 
+class ExactMatch implements Matcher {
+  match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
+    for (const param of pairs) {
+      const ok = param.key === key
+      if (ok) {
+        return param
+      }
+    }
+  }
+}
+
 class Overwrite implements Matcher {
   match(key: string, pairs: KeyVariablesPair[]): KeyVariablesPair | undefined {
     let pair: KeyVariablesPair | undefined
@@ -111,6 +122,9 @@ export class JSONMapper extends Mapper {
     switch (mode) {
       case 'first_match':
         this.matcher = new FirstMatch()
+        break
+      case 'exact_match':
+        this.matcher = new ExactMatch()
         break
       case 'overwrite':
         this.matcher = new Overwrite()

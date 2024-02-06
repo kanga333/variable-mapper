@@ -164,6 +164,16 @@ class FirstMatch {
         }
     }
 }
+class ExactMatch {
+    match(key, pairs) {
+        for (const param of pairs) {
+            const ok = param.key === key;
+            if (ok) {
+                return param;
+            }
+        }
+    }
+}
 class Overwrite {
     match(key, pairs) {
         let pair;
@@ -220,6 +230,9 @@ class JSONMapper extends Mapper {
         switch (mode) {
             case 'first_match':
                 this.matcher = new FirstMatch();
+                break;
+            case 'exact_match':
+                this.matcher = new ExactMatch();
                 break;
             case 'overwrite':
                 this.matcher = new Overwrite();
